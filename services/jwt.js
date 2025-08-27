@@ -1,38 +1,31 @@
 const jwt = require("jwt-simple");
 const moment = require("moment");
 
-const secret = "CLAVE_SECRETA_del_proyecto_DE_LA_RED_SoCial_987987";
+// Usar la clave desde el .env
+const secret = process.env.JWT_SECRET;
 
-// Función para crear token
 const createToken = (user) => {
     const payload = {
-        sub: user._id,                     // id del usuario
+        sub: user._id,
         name: user.name,
         surname: user.surname,
         nick: user.nick,
         email: user.email,
         image: user.image,
-        iat: moment().unix(),              // fecha de emisión
-        exp: moment().add(7, "days").unix() // expiración en 7 días
+        iat: moment().unix(),
+        exp: moment().add(7, "days").unix()
     };
 
-    // Devolver token codificado
     return jwt.encode(payload, secret);
 };
 
-// Función para verificar token
 const verifyToken = (token) => {
     try {
         const decoded = jwt.decode(token, secret);
-
-        // Comprobar expiración
-        if (decoded.exp <= moment().unix()) {
-            return null; // token expirado
-        }
-
-        return decoded; // token válido
+        if (decoded.exp <= moment().unix()) return null;
+        return decoded;
     } catch (err) {
-        return null; // token inválido
+        return null;
     }
 };
 
