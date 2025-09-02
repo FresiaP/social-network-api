@@ -91,10 +91,43 @@ const getProfile = (req, res) => {
   });
 };
 
+// Obtener datos de un usuario por ID
+const getUser = async (req, res) => {
+ try{
+const userId = req.params.id;
+const user = await User.findById(userId).select('.password'); // excluye la contaseña
+
+if(!user) {
+return res.status(404).json({message: "Usuario no encontrado"})
+}
+
+return res.status(200).json({user});
+
+ }catch(error){
+return res.status(404).json({message: "Error al obtener el usuario", error})
+ }
+
+}
+
+// Obtener perfil del usuario logueado
+const getMyProfile = async (req, res) => {
+  try{
+ const userId = req.user.sub; // id del token
+ const user = await User.findById(userId).select('-password'); // excluye la contaseña
+
+ return res.status(200).json({ user });
+
+}catch(error){
+  return res.status(500).json({ message: "Error al obtener el perfil", error})
+}
+}
+
 // Exportar todas las acciones juntas
 module.exports = {
     pruebaUser,
     register,
     login,
-    getProfile
+    getProfile,
+    getUser,
+    getMyProfile
 };
